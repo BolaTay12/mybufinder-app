@@ -38,23 +38,28 @@ const AllReports = () => {
                     }
                 });
 
-                // Fetch rejected items
-                const rejectedResponse = await fetch(`${baseUrl}/items/admin/rejected`, {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!approvedResponse.ok || !pendingResponse.ok || !rejectedResponse.ok) {
+                if (!approvedResponse.ok || !pendingResponse.ok) {
                     throw new Error(`Failed to fetch items.`);
                 }
 
                 const approvedData = await approvedResponse.json();
                 const pendingData = await pendingResponse.json();
-                const rejectedData = await rejectedResponse.json();
 
-                // Combine both lists
+                // Fetch rejected items (optional - may not exist yet)
+                let rejectedData = { data: [] };
+                try {
+                    const rejectedResponse = await fetch(`${baseUrl}/items/admin/rejected`, {
+                        headers: {
+                            'Authorization': `Bearer ${user.token}`,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (rejectedResponse.ok) {
+                        rejectedData = await rejectedResponse.json();
+                    }
+                } catch (e) { /* endpoint may not exist yet */ }
+
+                // Combine all lists
                 const allItems = [
                     ...(approvedData.data || []),
                     ...(pendingData.data || []),

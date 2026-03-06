@@ -22,47 +22,41 @@ const AdminDashboard = () => {
             try {
                 setIsLoading(true);
                 const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const headers = {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Accept': 'application/json'
+                };
 
                 // Fetch approved items
-                const approvedResponse = await fetch(`${baseUrl}/items`, {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Accept': 'application/json'
-                    }
-                });
+                const approvedResponse = await fetch(`${baseUrl}/items`, { headers });
 
                 // Fetch pending items
-                const pendingResponse = await fetch(`${baseUrl}/items/admin/pending`, {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Accept': 'application/json'
-                    }
-                });
+                const pendingResponse = await fetch(`${baseUrl}/items/admin/pending`, { headers });
 
-                // Fetch metrics
-                const metricsResponse = await fetch(`${baseUrl}/items/admin/metrics`, {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                // Fetch rejected items
-                const rejectedResponse = await fetch(`${baseUrl}/items/admin/rejected`, {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!approvedResponse.ok || !pendingResponse.ok || !rejectedResponse.ok || !metricsResponse.ok) {
-                    throw new Error(`Failed to fetch items or metrics.`);
+                if (!approvedResponse.ok || !pendingResponse.ok) {
+                    throw new Error(`Failed to fetch items.`);
                 }
 
                 const approvedData = await approvedResponse.json();
                 const pendingData = await pendingResponse.json();
-                const rejectedData = await rejectedResponse.json();
-                const metricsData = await metricsResponse.json();
+
+                // Fetch rejected items (optional - may not exist yet)
+                let rejectedData = { data: [] };
+                try {
+                    const rejectedResponse = await fetch(`${baseUrl}/items/admin/rejected`, { headers });
+                    if (rejectedResponse.ok) {
+                        rejectedData = await rejectedResponse.json();
+                    }
+                } catch (e) { /* endpoint may not exist yet */ }
+
+                // Fetch metrics (optional - may not exist yet)
+                let metricsData = { data: null };
+                try {
+                    const metricsResponse = await fetch(`${baseUrl}/items/admin/metrics`, { headers });
+                    if (metricsResponse.ok) {
+                        metricsData = await metricsResponse.json();
+                    }
+                } catch (e) { /* endpoint may not exist yet */ }
 
                 // Combine all lists
                 const allItems = [
