@@ -64,15 +64,15 @@ const Sidebar = () => {
     return (
         <aside className="hidden lg:flex flex-col w-72 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 overflow-y-auto p-6 gap-8">
             {/* User Profile */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 group cursor-default">
                 <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-slate-500">person</span>
+                    <div className="size-12 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-inner group-hover:shadow-lg">
+                        <span className="material-symbols-outlined text-2xl text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">person</span>
                     </div>
-                    <div className="flex flex-col">
-                        <h3 className="text-slate-900 dark:text-white font-semibold">{user?.name || 'Guest User'}</h3>
+                    <div className="flex flex-col overflow-hidden">
+                        <h3 className="text-slate-900 dark:text-white font-bold truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-purple-500 transition-all duration-300">{user?.name || 'Guest User'}</h3>
                         <p className="text-slate-500 dark:text-slate-400 text-xs truncate max-w-[160px]" title={user?.email}>{user?.email || user?.role || 'Welcome'}</p>
-                        <p className="text-slate-400 dark:text-slate-500 text-[10px]">{user?.matricNumber || ''}</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider mt-0.5">{user?.matricNumber || ''}</p>
                     </div>
                 </div>
             </div>
@@ -101,43 +101,43 @@ const Sidebar = () => {
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Menu</h4>
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${isActive('/dashboard')
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-primary dark:text-blue-400 font-medium'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 w-full text-left hover:-translate-y-0.5 hover:shadow-md ${isActive('/dashboard')
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 text-primary dark:text-blue-400 shadow-sm border border-blue-100/50 dark:border-blue-800/50'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-100 dark:hover:border-slate-700'
                         }`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">dashboard</span>
-                    <span className="text-sm">Dashboard</span>
+                    <span className={`material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-125 ${isActive('/dashboard') ? 'font-bold' : ''}`}>dashboard</span>
+                    <span className={`text-sm tracking-wide ${isActive('/dashboard') ? 'font-bold' : 'font-medium'}`}>Dashboard</span>
                 </button>
                 <button
                     onClick={() => navigate('/my-reports')}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${isActive('/my-reports')
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-primary dark:text-blue-400 font-medium'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 w-full text-left hover:-translate-y-0.5 hover:shadow-md ${isActive('/my-reports')
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 text-primary dark:text-blue-400 shadow-sm border border-blue-100/50 dark:border-blue-800/50'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-100 dark:hover:border-slate-700'
                         }`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">article</span>
-                    <span className="text-sm">My Reports</span>
+                    <span className={`material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-125 ${isActive('/my-reports') ? 'font-bold' : ''}`}>article</span>
+                    <span className={`text-sm tracking-wide ${isActive('/my-reports') ? 'font-bold' : 'font-medium'}`}>My Reports</span>
                 </button>
                 <button
                     onClick={() => navigate('/claims')}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${isActive('/claims')
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-primary dark:text-blue-400 font-medium'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 w-full text-left hover:-translate-y-0.5 hover:shadow-md ${isActive('/claims')
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 text-primary dark:text-blue-400 shadow-sm border border-blue-100/50 dark:border-blue-800/50'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-100 dark:hover:border-slate-700'
                         }`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">handshake</span>
-                    <span className="text-sm">Claims</span>
+                    <span className={`material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-125 ${isActive('/claims') ? 'font-bold' : ''}`}>handshake</span>
+                    <span className={`text-sm tracking-wide ${isActive('/claims') ? 'font-bold' : 'font-medium'}`}>Claims</span>
                 </button>
                 <button
                     onClick={() => navigate('/settings')}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors w-full text-left ${isActive('/settings')
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-primary dark:text-blue-400 font-medium'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 w-full text-left hover:-translate-y-0.5 hover:shadow-md ${isActive('/settings')
+                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 text-primary dark:text-blue-400 shadow-sm border border-blue-100/50 dark:border-blue-800/50'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-100 dark:hover:border-slate-700'
                         }`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">settings</span>
-                    <span className="text-sm">Settings</span>
+                    <span className={`material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-125 group-hover:rotate-45 ${isActive('/settings') ? 'font-bold' : ''}`}>settings</span>
+                    <span className={`text-sm tracking-wide ${isActive('/settings') ? 'font-bold' : 'font-medium'}`}>Settings</span>
                 </button>
             </nav>
 

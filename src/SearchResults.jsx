@@ -32,22 +32,12 @@ const SearchResults = () => {
         dateRange: { start: '', end: '' },
         location: 'All Locations'
     });
-    const [expandedCategories, setExpandedCategories] = useState(['Electronics']); // Default expanded
-
-    // Category Data Structure
-    const CATEGORY_DATA = [
-        {
-            name: 'Electronics',
-            subcategories: ['Laptops', 'Phones', 'Tablets', 'Accessories', 'Calculators']
-        },
-        {
-            name: 'Documents & IDs',
-            subcategories: ['Student ID', 'Driver License', 'Passport', 'Textbooks', 'Notebooks']
-        },
-        {
-            name: 'Personal Items',
-            subcategories: ['Clothing', 'Bags', 'Wallets', 'Keys', 'Water Bottles']
-        }
+    const CATEGORIES = [
+        'Electronics',
+        'Documents & IDs',
+        'Personal Items',
+        'Keys',
+        'Other'
     ];
 
     // API state
@@ -87,25 +77,18 @@ const SearchResults = () => {
 
             if (activeFilters.category.length > 0) {
                 const catMap = {
-                    'Laptops': 'Electronics',
-                    'Phones': 'Electronics',
-                    'Tablets': 'Electronics',
-                    'Accessories': 'Electronics',
-                    'Calculators': 'Electronics',
-                    'Student ID': 'Documents & IDs',
-                    'Driver License': 'Documents & IDs',
-                    'Passport': 'Documents & IDs',
-                    'Textbooks': 'Documents & IDs',
-                    'Notebooks': 'Documents & IDs',
-                    'Clothing': 'Clothing & Accessories',
-                    'Bags': 'Clothing & Accessories',
-                    'Wallets': 'Clothing & Accessories',
-                    'Keys': 'Keys',
-                    'Water Bottles': 'Other'
+                    'Electronics': 'electronics',
+                    'Documents & IDs': 'documents',
+                    'Documents': 'documents',
+                    'Personal Items': 'clothing',
+                    'Keys': 'keys',
+                    'Books': 'documents',
+                    'Other': 'other'
                 };
-                const selectedCat = activeFilters.category[0];
-                const mappedCategory = catMap[selectedCat] || selectedCat;
-                params.append('category', mappedCategory);
+                activeFilters.category.forEach(selectedCat => {
+                    const mappedCategory = catMap[selectedCat] || selectedCat.toLowerCase();
+                    params.append('category', mappedCategory);
+                });
             }
 
             if (activeFilters.location !== 'All Locations') {
@@ -167,13 +150,7 @@ const SearchResults = () => {
         }
     };
 
-    const toggleCategoryExpansion = (categoryName) => {
-        setExpandedCategories(prev =>
-            prev.includes(categoryName)
-                ? prev.filter(c => c !== categoryName)
-                : [...prev, categoryName]
-        );
-    };
+
 
     const handleStatusChange = (status) => {
         setActiveFilters(prev => {
@@ -258,41 +235,21 @@ const SearchResults = () => {
                         <div>
                             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Category</h3>
                             <div className="space-y-3">
-                                {CATEGORY_DATA.map((cat) => {
-                                    const isExpanded = expandedCategories.includes(cat.name);
-                                    return (
-                                        <div key={cat.name} className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 transition-colors">
-                                            <button
-                                                onClick={() => toggleCategoryExpansion(cat.name)}
-                                                className="w-full flex items-center justify-between p-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
-                                            >
-                                                <span>{cat.name}</span>
-                                                <span className={`material-symbols-outlined text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
-                                            </button>
-
-                                            {/* Subcategories with simple animation logic */}
-                                            <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                                <div className="p-3 pt-0 space-y-2 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50">
-                                                    {cat.subcategories.map(sub => (
-                                                        <label key={sub} className="flex items-center gap-3 cursor-pointer group">
-                                                            <div className="relative flex items-center">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="peer w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20 bg-white dark:bg-slate-700"
-                                                                    checked={activeFilters.category.includes(sub)}
-                                                                    onChange={() => handleCategorySelect(sub)}
-                                                                />
-                                                            </div>
-                                                            <span className={`text-sm text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors ${activeFilters.category.includes(sub) ? 'font-medium text-primary dark:text-blue-400' : ''}`}>
-                                                                {sub}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                {CATEGORIES.map((cat) => (
+                                    <label key={cat} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer hover:border-primary/50 hover:shadow-sm transition-all duration-300 group">
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                className="peer w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary/20 bg-white dark:bg-slate-700 transition-all"
+                                                checked={activeFilters.category.includes(cat)}
+                                                onChange={() => handleCategorySelect(cat)}
+                                            />
                                         </div>
-                                    );
-                                })}
+                                        <span className={`text-sm font-medium transition-colors duration-300 ${activeFilters.category.includes(cat) ? 'text-primary dark:text-blue-400 font-bold' : 'text-slate-700 dark:text-slate-300 group-hover:text-primary'}`}>
+                                            {cat}
+                                        </span>
+                                    </label>
+                                ))}
                             </div>
                         </div>
 
