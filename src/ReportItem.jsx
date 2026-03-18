@@ -343,7 +343,7 @@ const ReportItem = () => {
                                 <button
                                     type="button"
                                     onClick={() => navigate('/dashboard')}
-                                    className="flex items-center gap-2 px-6 py-3 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                    className="flex items-center gap-2 px-4 md:px-6 py-3 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
                                 >
                                     <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                                     Back
@@ -351,7 +351,7 @@ const ReportItem = () => {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex items-center gap-2 px-8 py-3 rounded-lg bg-[#136dec] hover:bg-blue-600 text-white font-bold text-sm shadow-md shadow-blue-500/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                                    className="flex items-center gap-2 px-6 md:px-8 py-3 rounded-lg bg-[#136dec] hover:bg-blue-600 text-white font-bold text-sm shadow-md shadow-blue-500/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap"
                                 >
                                     {isSubmitting ? (
                                         <>
