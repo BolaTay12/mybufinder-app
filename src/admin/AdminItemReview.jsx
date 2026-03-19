@@ -118,44 +118,44 @@ const AdminItemReview = () => {
     return (
         <div className="flex h-screen w-full bg-[#f8f9fc] font-['Lexend'] overflow-hidden">
             {/* Standard Admin Sidebar */}
-            <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-none z-10">
-                <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-                    <div className="size-8 bg-[#136dec] rounded-lg flex items-center justify-center text-white">
-                        <span className="material-symbols-outlined text-[20px]">school</span>
+            <aside className="w-64 bg-white/80 dark:bg-slate-900 border-r border-slate-200/50 dark:border-slate-800 flex flex-col flex-none z-10 backdrop-blur-xl shadow-xl transition-all duration-300">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 group cursor-default">
+                    <div className="size-10 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
+                        <span className="material-symbols-outlined text-[24px]">school</span>
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-slate-900 font-bold text-base leading-tight">MYBUFinder</h1>
-                        <span className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Admin Console</span>
+                        <h1 className="text-slate-900 dark:text-white font-bold text-lg leading-tight tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-purple-600 transition-all duration-300">MYBUFINDER</h1>
+                        <span className="text-primary text-[10px] font-bold uppercase tracking-widest">Admin Console</span>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
                     <button
                         onClick={() => navigate('/admin')}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary font-medium text-sm transition-all duration-300 hover:shadow-sm hover:translate-x-1"
                     >
-                        <span className="material-symbols-outlined text-[20px]">dashboard</span>
+                        <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110">dashboard</span>
                         Dashboard
                     </button>
                     <button
                         onClick={() => navigate('/admin/all-reports')}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary font-medium text-sm transition-all duration-300 hover:shadow-sm hover:translate-x-1"
                     >
-                        <span className="material-symbols-outlined text-[20px]">folder_open</span>
+                        <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110">folder_open</span>
                         All Reports
                     </button>
                     <button
                         onClick={() => navigate('/admin/claims')}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">fact_check</span>
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary font-medium text-sm transition-all duration-300 hover:shadow-sm hover:translate-x-1">
+                        <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:scale-110">fact_check</span>
                         Claims Review
                     </button>
                 </nav>
 
-                <div className="p-4 border-t border-slate-100">
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800">
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-rose-50 hover:text-rose-600 font-medium text-sm transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 font-medium text-sm transition-all duration-300 hover:shadow-sm hover:translate-x-1"
                     >
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Logout
@@ -196,41 +196,45 @@ const AdminItemReview = () => {
 
                         {/* Status Banner */}
                         {item.status !== 'APPROVED' && (
-                            <div className={`mb-6 p-4 rounded-xl border flex items-center justify-between ${item.status === 'PENDING'
-                                ? 'bg-orange-50 border-orange-200 text-orange-800'
-                                : 'bg-slate-200 border-slate-300 text-slate-700'
+                            <div className={`mb-8 p-5 rounded-2xl border flex items-center justify-between shadow-lg animate-fade-in-up transition-all duration-500 hover:scale-[1.01] ${item.status === 'PENDING'
+                                ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 text-orange-800 shadow-orange-500/10'
+                                : 'bg-slate-100 border-slate-300 text-slate-700'
                                 }`}>
-                                <div className="flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-2xl">
-                                        {item.status === 'PENDING' ? 'pending_actions' : 'info'}
-                                    </span>
+                                <div className="flex items-center gap-4">
+                                    <div className={`p-3 rounded-full ${item.status === 'PENDING' ? 'bg-orange-100 text-orange-600 shadow-inner' : 'bg-slate-200 text-slate-500'}`}>
+                                        <span className="material-symbols-outlined text-3xl">
+                                            {item.status === 'PENDING' ? 'pending_actions' : 'info'}
+                                        </span>
+                                    </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">
+                                        <h3 className="font-bold text-xl tracking-tight">
                                             {item.status === 'PENDING' ? 'Action Required' : `Status: ${item.status}`}
                                         </h3>
-                                        <p className="text-sm opacity-80">
+                                        <p className="text-sm opacity-80 mt-1 font-medium">
                                             {item.status === 'PENDING' ? 'This report is awaiting your review to be visible on the public dashboard.' : 'This item has already been processed.'}
                                         </p>
                                     </div>
                                 </div>
                                 {item.status === 'PENDING' && (
-                                    <div className="flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm">
+                                    <div className="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-white/50">
                                         <button
                                             onClick={() => handleAction('reject')}
                                             disabled={actionLoading}
-                                            className="flex items-center gap-2 px-6 py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold rounded-lg transition-colors disabled:opacity-50"
+                                            className="flex items-center gap-2 px-6 py-3 bg-white text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-bold rounded-lg transition-all duration-300 hover:shadow-md disabled:opacity-50 border border-slate-100"
                                         >
-                                            <span className="material-symbols-outlined text-[18px]">close</span>
+                                            <span className="material-symbols-outlined text-[20px]">close</span>
                                             Reject
                                         </button>
-                                        <button
-                                            onClick={() => handleAction('approve')}
-                                            disabled={actionLoading}
-                                            className="flex items-center gap-2 px-6 py-2.5 bg-[#136dec] text-white hover:bg-[#0f58c5] font-bold rounded-lg transition-colors disabled:opacity-50 shadow-sm shadow-[#136dec]/20"
-                                        >
-                                            <span className="material-symbols-outlined text-[18px]">check</span>
-                                            Approve
-                                        </button>
+                                        <div className="aura-effect">
+                                            <button
+                                                onClick={() => handleAction('approve')}
+                                                disabled={actionLoading}
+                                                className="relative flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-primary to-blue-600 text-white font-bold rounded-lg transition-all duration-300 hover:shadow-lg disabled:opacity-50"
+                                            >
+                                                <span className="material-symbols-outlined text-[20px]">check</span>
+                                                Approve
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -239,36 +243,39 @@ const AdminItemReview = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                             {/* Left Column: Image & Actions */}
-                            <div className="lg:col-span-1 space-y-6">
-                                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-                                    <div className="aspect-square bg-slate-100 flex items-center justify-center relative">
+                            <div className="lg:col-span-1 space-y-6 animate-fade-in-up delay-100">
+                                <div className="swaggy-card p-2 overflow-hidden">
+                                    <div className="aspect-square bg-slate-100 rounded-lg flex items-center justify-center relative overflow-hidden group">
                                         {item.imageUrl ? (
                                             <img
                                                 src={item.imageUrl}
                                                 alt={item.title}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                         ) : (
                                             <span className="material-symbols-outlined text-6xl text-slate-300">image_not_supported</span>
                                         )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                         <div className="absolute top-4 left-4 flex gap-2">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${item.type === 'FOUND' ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'
+                                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-md transition-transform duration-300 hover:scale-105 ${item.type === 'FOUND' ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'
                                                 }`}>
                                                 {item.type}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="p-4 border-t border-slate-100 grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">Date Reported</p>
-                                            <p className="font-bold text-slate-900 text-sm">
-                                                {new Date(item.createdAt).toLocaleDateString()}
+                                    <div className="p-5 mt-2 grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
+                                        <div className="group cursor-default">
+                                            <p className="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-widest group-hover:text-primary transition-colors">Date Reported</p>
+                                            <p className="font-bold text-slate-900 dark:text-white text-sm">
+                                                {new Date(item.createdAt).toLocaleDateString(undefined, {
+                                                    year: 'numeric', month: 'short', day: 'numeric'
+                                                })}
                                             </p>
                                         </div>
-                                        <div>
-                                            <p className="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wider">Category</p>
-                                            <p className="font-bold text-slate-900 text-sm capitalize">
+                                        <div className="group cursor-default">
+                                            <p className="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-widest group-hover:text-primary transition-colors">Category</p>
+                                            <p className="font-bold text-slate-900 dark:text-white text-sm capitalize bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text">
                                                 {item.category || 'N/A'}
                                             </p>
                                         </div>
@@ -277,51 +284,60 @@ const AdminItemReview = () => {
                             </div>
 
                             {/* Right Column: Details */}
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-                                    <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full opacity-20 pointer-events-none ${item.type === 'FOUND' ? 'bg-emerald-500' : 'bg-rose-500'
+                            <div className="lg:col-span-2 space-y-6 animate-fade-in-up delay-200">
+                                <div className="swaggy-card p-8 relative overflow-hidden z-0">
+                                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-bl from-primary/20 via-primary/5 to-transparent rounded-full blur-3xl -z-10 animate-pulse-soft"></div>
+                                    <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] rounded-full opacity-30 pointer-events-none -z-10 ${item.type === 'FOUND' ? 'bg-emerald-500' : 'bg-rose-500'
                                         }`}></div>
 
-                                    <h1 className="text-3xl font-bold text-slate-900 mb-4">{item.title}</h1>
+                                    <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight">{item.title}</h1>
 
-                                    <div className="mb-8">
-                                        <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-slate-400 text-[18px]">description</span>
+                                    <div className="mb-10 group">
+                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-primary group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                                <span className="material-symbols-outlined text-[20px]">description</span>
+                                            </div>
                                             Description
                                         </h3>
-                                        <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-                                            {item.description}
-                                        </p>
+                                        <div className="p-5 bg-slate-50/80 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:bg-slate-100/80 dark:hover:bg-slate-800 transition-colors duration-300">
+                                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap font-medium">
+                                                {item.description}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className="mb-8">
-                                        <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-slate-400 text-[18px]">location_on</span>
+                                    <div className="mb-10 group">
+                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-primary group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                                <span className="material-symbols-outlined text-[20px]">location_on</span>
+                                            </div>
                                             Location Information
                                         </h3>
-                                        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
-                                            <div className="size-10 bg-blue-100 text-[#136dec] rounded-full flex items-center justify-center flex-none">
+                                        <div className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group-hover:border-primary/30">
+                                            <div className="size-12 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-xl flex items-center justify-center flex-none">
                                                 <span className="material-symbols-outlined">pin_drop</span>
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-900 capitalize">{item.location}</p>
-                                                <p className="text-sm text-slate-500">Recorded Area</p>
+                                                <p className="font-bold text-lg text-slate-900 dark:text-white capitalize">{item.location}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-1">Recorded Area</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-100 pb-2 flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-slate-400 text-[18px]">account_circle</span>
+                                    <div className="group">
+                                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-primary group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                                <span className="material-symbols-outlined text-[20px]">account_circle</span>
+                                            </div>
                                             Reporter Information
                                         </h3>
-                                        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
-                                            <div className="size-10 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center flex-none">
+                                        <div className="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group-hover:border-primary/30">
+                                            <div className="size-12 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 text-slate-600 dark:text-slate-300 rounded-xl flex items-center justify-center flex-none shadow-inner">
                                                 <span className="material-symbols-outlined">person</span>
                                             </div>
                                             <div className="truncate w-full">
-                                                <p className="font-bold text-slate-900 text-sm truncate">ID: {item.submittedBy}</p>
-                                                <p className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-0.5">Report Originator</p>
+                                                <p className="font-bold text-slate-900 dark:text-white text-base truncate font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block">ID: {item.submittedBy}</p>
+                                                <p className="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-bold tracking-widest mt-2">Report Originator</p>
                                             </div>
                                         </div>
                                     </div>

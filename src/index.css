@@ -5,17 +5,69 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Lexend', sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply text-slate-900 dark:text-slate-100;
+  }
+
+  /* Global smooth transitions for interactive elements */
+  a,
+  button {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  /* Global active scale effect for maximum swagginess */
+  button:active:not(:disabled),
+  a:active:not([aria-disabled="true"]) {
+    transform: scale(0.96);
+  }
+
+  /* Swaggy inputs */
+  input,
+  select,
+  textarea {
+    @apply transition-all duration-300 ease-in-out focus:scale-[1.01] focus:shadow-lg focus:shadow-primary/10;
+  }
 }
 
-body {
-  font-family: 'Lexend', sans-serif;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer components {
+
+  /* The Aura Effect */
+  .aura-effect {
+    @apply relative z-0;
+  }
+
+  .aura-effect::after {
+    @apply content-[''] absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-xl blur-lg opacity-20 -z-10 animate-pulse-soft transition-opacity duration-500;
+  }
+
+  .aura-effect:hover::after {
+    @apply opacity-50 blur-xl animate-none scale-105;
+  }
+
+  /* Swaggy Card Definition */
+  .swaggy-card {
+    @apply bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm shadow-sm rounded-xl transition-all duration-500 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 hover:border-primary/30;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-700/50;
+  }
 }
 
 /* Custom Animations */
@@ -41,6 +93,30 @@ body {
   }
 }
 
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -48,6 +124,16 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
   opacity: 0;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
 .delay-100 {

@@ -23,6 +23,13 @@ const Settings = () => {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
+    // Help & Support accordion state
+    const [expandedHelp, setExpandedHelp] = useState(null);
+
+    const toggleHelp = (id) => {
+        setExpandedHelp(expandedHelp === id ? null : id);
+    };
+
     const handlePasswordUpdate = async (e) => {
         e.preventDefault();
 
@@ -398,18 +405,99 @@ const Settings = () => {
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-4">
-                                            <a href="#" className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors group">
-                                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary mb-1">How to report a lost item?</h3>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">Learn the improved process for reporting lost items on campus.</p>
-                                            </a>
-                                            <a href="#" className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors group">
-                                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary mb-1">Safety Guidelines</h3>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">Important safety tips when meeting up to exchange found items.</p>
-                                            </a>
-                                            <a href="#" className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-colors group">
-                                                <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary mb-1">Contact Support</h3>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">Need help? Reach out to the admin team.</p>
-                                            </a>
+                                            <div className={`rounded-xl border transition-all duration-300 overflow-hidden ${expandedHelp === 'report' ? 'border-primary/30 shadow-md shadow-primary/10 bg-white dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700 hover:border-primary/40 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800'}`}>
+                                                <button onClick={() => toggleHelp('report')} className="w-full p-5 text-left flex justify-between items-center group">
+                                                    <div>
+                                                        <h3 className={`text-[15px] font-bold mb-1 transition-colors duration-300 ${expandedHelp === 'report' ? 'text-primary' : 'text-slate-900 dark:text-white group-hover:text-primary'}`}>How to report a lost item?</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">Learn the improved process for reporting lost items on campus.</p>
+                                                    </div>
+                                                    <div className={`flex items-center justify-center size-8 rounded-full transition-all duration-300 transform ${expandedHelp === 'report' ? 'bg-primary/10 text-primary rotate-180' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                                                        <span className="material-symbols-outlined text-lg">expand_more</span>
+                                                    </div>
+                                                </button>
+                                                <div className={`grid transition-all duration-300 ease-in-out ${expandedHelp === 'report' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                                    <div className="overflow-hidden">
+                                                        <div className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-300">
+                                                            <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                                                                <ol className="list-decimal pl-5 space-y-2.5">
+                                                                    <li>Navigate to the <span className="font-semibold text-slate-900 dark:text-white">Report Item</span> page from the sidebar menu.</li>
+                                                                    <li>Choose whether you are reporting a Lost or Found item.</li>
+                                                                    <li>Fill in detailed information including category, date, and location.</li>
+                                                                    <li>Upload clear photos to help track the item faster.</li>
+                                                                    <li>Submit the report and you will be notified if a match is found.</li>
+                                                                </ol>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className={`rounded-xl border transition-all duration-300 overflow-hidden ${expandedHelp === 'safety' ? 'border-primary/30 shadow-md shadow-primary/10 bg-white dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700 hover:border-primary/40 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800'}`}>
+                                                <button onClick={() => toggleHelp('safety')} className="w-full p-5 text-left flex justify-between items-center group">
+                                                    <div>
+                                                        <h3 className={`text-[15px] font-bold mb-1 transition-colors duration-300 ${expandedHelp === 'safety' ? 'text-primary' : 'text-slate-900 dark:text-white group-hover:text-primary'}`}>Safety Guidelines</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">Important safety tips when meeting up to exchange found items.</p>
+                                                    </div>
+                                                    <div className={`flex items-center justify-center size-8 rounded-full transition-all duration-300 transform ${expandedHelp === 'safety' ? 'bg-primary/10 text-primary rotate-180' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                                                        <span className="material-symbols-outlined text-lg">expand_more</span>
+                                                    </div>
+                                                </button>
+                                                <div className={`grid transition-all duration-300 ease-in-out ${expandedHelp === 'safety' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                                    <div className="overflow-hidden">
+                                                        <div className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-300">
+                                                            <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                                                                <ul className="list-disc pl-5 space-y-2.5">
+                                                                    <li><span className="font-medium text-slate-900 dark:text-white">Meet in Public:</span> Always arrange meetups in busy, well-lit campus areas (e.g., library, cafeteria).</li>
+                                                                    <li><span className="font-medium text-slate-900 dark:text-white">Daylight Hours:</span> Try to schedule exchanges during typical daytime hours.</li>
+                                                                    <li><span className="font-medium text-slate-900 dark:text-white">Bring a Friend:</span> Ask a friend or colleague to accompany you to the exchange.</li>
+                                                                    <li><span className="font-medium text-slate-900 dark:text-white">Verify Items:</span> Thoroughly verify the item matches before completing the handover.</li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className={`rounded-xl border transition-all duration-300 overflow-hidden ${expandedHelp === 'contact' ? 'border-primary/30 shadow-md shadow-primary/10 bg-white dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700 hover:border-primary/40 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800'}`}>
+                                                <button onClick={() => toggleHelp('contact')} className="w-full p-5 text-left flex justify-between items-center group">
+                                                    <div>
+                                                        <h3 className={`text-[15px] font-bold mb-1 transition-colors duration-300 ${expandedHelp === 'contact' ? 'text-primary' : 'text-slate-900 dark:text-white group-hover:text-primary'}`}>Contact Support</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">Need help? Reach out to the admin team.</p>
+                                                    </div>
+                                                    <div className={`flex items-center justify-center size-8 rounded-full transition-all duration-300 transform ${expandedHelp === 'contact' ? 'bg-primary/10 text-primary rotate-180' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                                                        <span className="material-symbols-outlined text-lg">expand_more</span>
+                                                    </div>
+                                                </button>
+                                                <div className={`grid transition-all duration-300 ease-in-out ${expandedHelp === 'contact' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                                    <div className="overflow-hidden">
+                                                        <div className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-300">
+                                                            <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50">
+                                                                <div className="flex flex-col space-y-4">
+                                                                    <p>If you have any issues or need further assistance, our admin team is here to help.</p>
+                                                                    <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:-translate-y-0.5 transition-transform duration-300">
+                                                                        <div className="flex items-center justify-center size-8 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary shrink-0">
+                                                                            <span className="material-symbols-outlined text-sm">mail</span>
+                                                                        </div>
+                                                                        <a href="mailto:support@bufinder.edu" className="text-primary hover:underline font-medium">support@bufinder.edu</a>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:-translate-y-0.5 transition-transform duration-300">
+                                                                        <div className="flex items-center justify-center size-8 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 shrink-0">
+                                                                            <span className="material-symbols-outlined text-sm">call</span>
+                                                                        </div>
+                                                                        <span>+234 800 BUFINDER</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 hover:-translate-y-0.5 transition-transform duration-300">
+                                                                        <div className="flex items-center justify-center size-8 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 shrink-0">
+                                                                            <span className="material-symbols-outlined text-sm">location_on</span>
+                                                                        </div>
+                                                                        <span className="flex-1">security on patrol (SOP) office @ amphitheater</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
