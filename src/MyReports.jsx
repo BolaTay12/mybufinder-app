@@ -36,6 +36,8 @@ const MyReports = () => {
 
                 const data = await response.json();
                 if (data.status === 'success' && Array.isArray(data.data)) {
+
+                    
                     setReports(data.data);
                 } else {
                     setReports([]);

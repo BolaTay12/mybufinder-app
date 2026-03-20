@@ -95,9 +95,6 @@ const SearchResults = () => {
                 params.append('location', activeFilters.location);
             }
 
-            params.append('limit', pagination.limit);
-            params.append('offset', currentOffset);
-
             // Create React App proxy will only forward requests reliably if they accept json
             const headers = {
                 'Accept': 'application/json'
@@ -107,9 +104,16 @@ const SearchResults = () => {
             // Backend /items/search throws 400 if q is empty or < 1 char. 
             // Better to fetch all items via /items if there's no query.
             if (searchQuery.trim().length > 0) {
+                params.append('limit', pagination.limit);
+                params.append('offset', currentOffset);
                 params.append('q', searchQuery.trim());
                 fetchUrl = `${baseUrl}/items/search?${params.toString()}`;
             } else {
+                // Since this is fetching all items without the backend's native search,
+                // and the backend /items ignores category/type filters, we must fetch
+                // a large batch and filter locally.
+                params.append('limit', 1000);
+                params.append('offset', 0);
                 fetchUrl = `${baseUrl}/items?${params.toString()}`;
             }
 
@@ -135,8 +139,45 @@ const SearchResults = () => {
 
             const data = await response.json();
             if (data.status === 'success') {
-                setItems(data.data || []);
-                setPagination(prev => ({ ...prev, total: data.pagination?.total || data.data?.length || 0, offset: currentOffset }));
+                let fetchedItems = data.data || [];
+                
+                // If we fetched from /items (no search query), we need to manually apply filters locally
+                // because the backend ignores them on the /items endpoint.
+                if (searchQuery.trim().length === 0) {
+                    if (activeFilters.status.length === 1) {
+                        const expectedType = activeFilters.status[0] === 'Lost Items' ? 'LOST' : 'FOUND';
+                        fetchedItems = fetchedItems.filter(item => item.type === expectedType);
+                    }
+                    if (activeFilters.category.length > 0) {
+                        const catMap = {
+                            'Electronics': 'electronics',
+                            'Documents & IDs': 'documents',
+                            'Documents': 'documents',
+                            'Personal Items': 'clothing',
+                            'Keys': 'keys',
+                            'Books': 'documents',
+                            'Other': 'other'
+                        };
+                        const mappedSelectedCats = activeFilters.category.map(cat => catMap[cat] || cat.toLowerCase());
+                        fetchedItems = fetchedItems.filter(item => {
+                            const itemCat = item.category ? item.category.toLowerCase() : '';
+                            return mappedSelectedCats.includes(itemCat);
+                        });
+                    }
+                    if (activeFilters.location !== 'All Locations') {
+                        fetchedItems = fetchedItems.filter(item => item.location === activeFilters.location);
+                    }
+                    
+                    // Local pagination
+                    const totalItems = fetchedItems.length;
+                    const paginatedItems = fetchedItems.slice(currentOffset, currentOffset + pagination.limit);
+                    
+                    setItems(paginatedItems);
+                    setPagination(prev => ({ ...prev, total: totalItems, offset: currentOffset }));
+                } else {
+                    setItems(fetchedItems);
+                    setPagination(prev => ({ ...prev, total: data.pagination?.total || fetchedItems.length || 0, offset: currentOffset }));
+                }
             } else {
                 throw new Error(data.message || 'Error searching items');
             }
