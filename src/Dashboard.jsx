@@ -20,7 +20,8 @@ const Dashboard = () => {
     const fetchItems = async () => {
       try {
         setIsLoading(true);
-        const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+        const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
         // Determine endpoint based on active tab and ask for 12 items specifically
         const endpoint = activeTab === 'recently-lost' ? '/items/recently-lost?limit=12' : '/items/recently-found?limit=12';

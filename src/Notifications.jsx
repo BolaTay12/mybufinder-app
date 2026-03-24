@@ -27,7 +27,8 @@ const Notifications = () => {
             setError(null);
             if (!append) setIsLoading(true);
 
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
             const skip = pageNum * TAKE;
             const response = await fetch(`${baseUrl}/notifications?skip=${skip}&take=${TAKE}`, {
                 headers: {
@@ -76,7 +77,8 @@ const Notifications = () => {
 
         try {
             setIsMarkingRead(id);
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
             const response = await fetch(`${baseUrl}/notifications/${id}/read`, {
                 method: 'PATCH',
                 headers: {
