@@ -21,7 +21,8 @@ const Claims = () => {
             if (!user?.token) return;
             try {
                 setIsLoading(true);
-                const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
                 const response = await fetch(`${baseUrl}/claims/my?limit=100&offset=0`, {
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -61,7 +62,8 @@ const Claims = () => {
 
         try {
             setIsCancelling(claimId);
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
             // Assuming there is a rejection or delete endpoint for users to cancel claims
             // Using the admin reject endpoint or similar standard REST pattern, fallback to simulation if it fails

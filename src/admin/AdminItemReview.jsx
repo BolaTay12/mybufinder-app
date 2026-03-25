@@ -21,7 +21,8 @@ const AdminItemReview = () => {
 
             try {
                 setIsLoading(true);
-                const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
                 const response = await fetch(`${baseUrl}/items/${itemId}`, {
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
@@ -58,7 +59,8 @@ const AdminItemReview = () => {
 
         try {
             setActionLoading(true);
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
             const endpoint = action === 'approve' ? 'approve' : 'reject';
 
