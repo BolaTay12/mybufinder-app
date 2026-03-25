@@ -20,7 +20,8 @@ const AllReports = () => {
 
             try {
                 setIsLoading(true);
-                const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
                 // Fetch approved items
                 const approvedResponse = await fetch(`${baseUrl}/items`, {
@@ -90,7 +91,8 @@ const AllReports = () => {
         if (!confirmed) return;
 
         try {
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
             const response = await fetch(`${baseUrl}/items/${itemId}/${action}`, {
                 method: 'PATCH',
                 headers: {
@@ -124,7 +126,8 @@ const AllReports = () => {
         if (!confirmed) return;
 
         try {
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
             const response = await fetch(`${baseUrl}/items/${itemId}`, {
                 method: 'DELETE',
                 headers: {

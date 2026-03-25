@@ -27,7 +27,8 @@ const AllClaims = () => {
 
             try {
                 setIsLoading(true);
-                const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
                 // Real Endpoint Attempt:
                 const response = await fetch(`${baseUrl}/claims/admin?limit=100&offset=0`, {
@@ -94,7 +95,8 @@ const AllClaims = () => {
         setIsStatusChanging(true);
 
         try {
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
             // Try actual backend integration
             const endpoint = newStatus === 'APPROVED' ? 'approve' : 'reject';
@@ -143,7 +145,8 @@ const AllClaims = () => {
         setIsLoadingDetails(true);
 
         try {
-            const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
             const response = await fetch(`${baseUrl}/claims/admin/${claimId}`, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

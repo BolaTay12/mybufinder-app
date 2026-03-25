@@ -54,7 +54,8 @@ const MatchAnalysis = () => {
                 const user = userString ? JSON.parse(userString) : null;
                 const token = user?.token || '';
 
-                const baseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production.up.railway.app');
+                const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+        const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
                 // Fetch potential matches using new endpoint
                 const response = await fetch(`${baseUrl}/items/${lostItem.rawId}/matches`, {
                     headers: {
