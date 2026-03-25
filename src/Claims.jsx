@@ -206,12 +206,15 @@ const Claims = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-center py-12">
-                                    <div className="size-16 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-                                        <span className="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500">handshake</span>
+                                <div className="text-center py-16 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
+                                    <div className="relative mb-6">
+                                        <div className="absolute inset-0 bg-primary/20 dark:bg-primary/10 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+                                        <div className="relative size-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-md border border-slate-200 dark:border-slate-700">
+                                            <span className="material-symbols-outlined text-4xl text-slate-400 dark:text-slate-500 animate-bounce" style={{ animationDuration: '2s' }}>handshake</span>
+                                        </div>
                                     </div>
-                                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">No claims yet</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto mt-1">When you find an item that belongs to you, claim it and track it here.</p>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No claims yet</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mx-auto mt-1">When you find an item that belongs to you, claim it and track it here.</p>
                                 </div>
                             )}
                         </div>
