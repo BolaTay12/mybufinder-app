@@ -9,6 +9,7 @@ const AllReports = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
@@ -40,7 +41,7 @@ const AllReports = () => {
                 });
 
                 if (!approvedResponse.ok || !pendingResponse.ok) {
-                    throw new Error(`Failed to fetch items.`);
+                    throw new Error(`Server Error: Unable to fetch items.`);
                 }
 
                 const approvedData = await approvedResponse.json();
@@ -72,7 +73,7 @@ const AllReports = () => {
                 setItems(sortedData);
             } catch (err) {
                 console.error("Error fetching admin items:", err);
-                setError(err.message);
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
             } finally {
                 setIsLoading(false);
             }
@@ -90,6 +91,7 @@ const AllReports = () => {
         });
         if (!confirmed) return;
 
+        setIsActionLoading(true);
         try {
             const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
         const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
@@ -113,6 +115,8 @@ const AllReports = () => {
         } catch (err) {
             console.error(`Error trying to ${action} item:`, err);
             showToast(err.message || `Failed to ${action} item.`, 'error');
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -125,6 +129,7 @@ const AllReports = () => {
         });
         if (!confirmed) return;
 
+        setIsActionLoading(true);
         try {
             const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
         const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
@@ -147,6 +152,8 @@ const AllReports = () => {
         } catch (err) {
             console.error('Error trying to delete item:', err);
             showToast(err.message || 'Failed to delete item.', 'error');
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -161,6 +168,7 @@ const AllReports = () => {
 
     return (
         <div className="flex h-screen w-full bg-[#f8f9fc] font-['Lexend'] overflow-hidden">
+            {isActionLoading && <LoadingSpinner fullScreen />}
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-none z-10">
                 <div className="p-6 border-b border-slate-100 flex items-center gap-3">

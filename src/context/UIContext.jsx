@@ -154,7 +154,7 @@ export const UIProvider = ({ children }) => {
                                     {confirmDialog.title}
                                 </h3>
                             </div>
-                            <p className="text-slate-600 text-sm">{confirmDialog.message}</p>
+                            <p className="text-slate-600 text-sm whitespace-pre-line">{confirmDialog.message}</p>
                         </div>
 
                         <div className="p-4 flex items-center justify-end gap-3 bg-slate-50">

@@ -11,6 +11,7 @@ const AdminDashboard = () => {
     const [items, setItems] = useState([]);
     const [metrics, setMetrics] = useState({ totalReports: 0, pendingApprovals: 0, resolvedCases: 0 });
     const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const { showToast, showConfirm } = useUI();
@@ -35,7 +36,7 @@ const AdminDashboard = () => {
                 const pendingResponse = await fetch(`${baseUrl}/items/admin/pending`, { headers });
 
                 if (!approvedResponse.ok || !pendingResponse.ok) {
-                    throw new Error(`Failed to fetch items.`);
+                    throw new Error(`Server Error: Unable to fetch items.`);
                 }
 
                 const approvedData = await approvedResponse.json();
@@ -72,7 +73,7 @@ const AdminDashboard = () => {
                 }
             } catch (err) {
                 console.error("Error fetching admin items:", err);
-                setError(err.message);
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
             } finally {
                 setIsLoading(false);
             }
@@ -90,6 +91,7 @@ const AdminDashboard = () => {
         });
         if (!confirmed) return;
 
+        setIsActionLoading(true);
         try {
             const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
         const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
@@ -118,6 +120,8 @@ const AdminDashboard = () => {
         } catch (err) {
             console.error(`Error trying to ${action} item:`, err);
             showToast(err.message || `Failed to ${action} item.`, 'error');
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -139,6 +143,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="flex h-screen w-full bg-[#f8f9fc] font-['Lexend'] overflow-hidden">
+            {isActionLoading && <LoadingSpinner fullScreen />}
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-none z-10">
                 <div className="p-6 border-b border-slate-100 flex items-center gap-3">
@@ -239,7 +244,7 @@ const AdminDashboard = () => {
                                 <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] flex items-start justify-between animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
                                     <div>
                                         <p className="text-slate-500 text-sm font-medium mb-1">Total Reports</p>
-                                        <h3 className="text-3xl font-bold text-slate-900 mb-2">{totalReports.toLocaleString()}</h3>
+                                        <h3 className="text-3xl font-bold text-slate-900 mb-2">{totalReports ? totalReports.toLocaleString() : '0'}</h3>
                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-50 text-slate-600">
                                             System Lifetime
                                         </span>

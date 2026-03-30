@@ -7,7 +7,21 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    const { showToast } = useUI();
+    const { showToast, showConfirm } = useUI();
+
+    const handleGuidelines = () => {
+        showConfirm({
+            title: 'Campus Reporting Guidelines',
+            message: '1. If you find an item, report it here immediately.\n2. Hand over valuable items to the campus security office or department office.\n3. Do not attempt to meet strangers off-campus for item exchange.\n\nReady to report an item?',
+            confirmText: 'Report Item',
+            cancelText: 'Cancel',
+            type: 'info'
+        }).then((confirmed) => {
+            if (confirmed) {
+                navigate('/report-item');
+            }
+        });
+    };
     const [lostCount, setLostCount] = useState(0);
     const [foundCount, setFoundCount] = useState(0);
 
@@ -143,10 +157,10 @@ const Sidebar = () => {
             </nav>
 
             <div className="mt-auto">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-[#136dec] to-blue-600 text-white">
-                    <p className="text-sm font-medium mb-2">Help keep campus safe.</p>
-                    <p className="text-xs text-blue-100 mb-3">Found something? Report it immediately to help the owner.</p>
-                    <button className="w-full py-2 bg-white/20 hover:bg-white/30 rounded text-xs font-bold transition-colors">Learn Guidelines</button>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-[#136dec] to-blue-600 text-white shadow-md">
+                    <p className="text-sm font-bold mb-2">Help keep campus safe.</p>
+                    <p className="text-xs text-blue-100 mb-4 leading-relaxed">Found something? Report it immediately to help the owner.</p>
+                    <button onClick={handleGuidelines} className="w-full py-2.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition-colors">Learn Guidelines</button>
                 </div>
             </div>
         </aside>

@@ -36,7 +36,7 @@ const AdminLogin = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: data.email,
+                    email: data.email.trim(),
                     password: data.password
                 }),
             });
@@ -77,7 +77,7 @@ const AdminLogin = () => {
 
             const userData = {
                 ...userPayload,
-                email: data.email,
+                email: data.email.trim(),
                 token: accessToken,
                 role: 'ADMIN',
             };

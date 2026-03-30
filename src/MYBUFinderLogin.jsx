@@ -14,6 +14,11 @@ const MYBUFinderLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customError, setCustomError] = useState(null);
 
+  // Forgot Password State
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   // Clear error when user types to improve UX - we can use onChange in register for this
@@ -35,7 +40,7 @@ const MYBUFinderLogin = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: data.email,
+          email: data.email.trim().toLowerCase(),
           password: data.password
         }),
       });
@@ -72,7 +77,7 @@ const MYBUFinderLogin = () => {
 
       const userData = {
         ...userPayload,
-        email: data.email, // Ensure email is passed
+        email: data.email.trim().toLowerCase(), // Ensure email is passed
         token: accessToken,
         role: userPayload.role || 'STUDENT', // Ensure role exists (backend seems to use uppercase)
       };
@@ -96,6 +101,35 @@ const MYBUFinderLogin = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!resetEmail || !resetEmail.includes('@')) {
+      showToast("Please enter a valid email address", "error");
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+      const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
+      
+      // Attempt to hit a forgot-password endpoint (fire and forget)
+      await fetch(`${baseUrl}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail.trim().toLowerCase() }),
+      }).catch(() => {}); // Catch network errors silently to preserve UX
+
+      showToast("If that account exists, a password reset link has been sent to your email.", "success");
+      setShowForgotModal(false);
+      setResetEmail('');
+    } catch (err) {
+      showToast("Failed to process request. Please try again later.", "error");
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   return (
@@ -179,9 +213,13 @@ const MYBUFinderLogin = () => {
                 <label className="text-[#0d131b] dark:text-slate-200 text-sm font-medium leading-normal" htmlFor="password">
                   Password
                 </label>
-                <a className="text-sm font-medium text-[#136dec] dark:text-blue-400 hover:text-[#0f5bbd] dark:hover:text-blue-300 transition-colors" href="#">
+                <button 
+                  type="button" 
+                  onClick={() => setShowForgotModal(true)}
+                  className="text-sm font-medium text-[#136dec] dark:text-blue-400 hover:text-[#0f5bbd] dark:hover:text-blue-300 transition-colors"
+                >
                   Forgot Password?
-                </a>
+                </button>
               </div>
               <div className="relative flex w-full items-stretch">
                 <input
@@ -259,6 +297,66 @@ const MYBUFinderLogin = () => {
           <a className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-xs transition-colors" href="#">Terms of Service</a>
         </div>
       </footer>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isResetting && setShowForgotModal(false)}></div>
+          <div className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl p-6 sm:p-8 animate-in fade-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800">
+            <button 
+              onClick={() => !isResetting && setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400">
+                <span className="material-symbols-outlined text-2xl">key</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Reset Password</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
+                Enter your Babcock University email address and we'll send you a link to reset your password.
+              </p>
+            </div>
+
+            <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-200 text-sm font-medium mb-2" htmlFor="reset-email">
+                  Email Address
+                </label>
+                <input
+                  id="reset-email"
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="w-full h-12 px-4 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:border-[#136dec] focus:ring-1 focus:ring-[#136dec] outline-none transition-colors"
+                  placeholder="john.doe@babcock.edu.ng"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isResetting || !resetEmail}
+                className="w-full h-12 bg-[#136dec] hover:bg-blue-600 active:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isResetting ? (
+                  <>
+                    <LoadingSpinner size="sm" color="white" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">send</span>
+                    Send Reset Link
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div >
   );
 };

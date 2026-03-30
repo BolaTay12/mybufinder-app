@@ -38,7 +38,7 @@ const AdminItemReview = () => {
                 setItem(result.data);
             } catch (err) {
                 console.error("Error fetching admin item details:", err);
-                setError(err.message);
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
             } finally {
                 setIsLoading(false);
             }
@@ -119,6 +119,7 @@ const AdminItemReview = () => {
 
     return (
         <div className="flex h-screen w-full bg-[#f8f9fc] font-['Lexend'] overflow-hidden">
+            {actionLoading && <LoadingSpinner fullScreen />}
             {/* Standard Admin Sidebar */}
             <aside className="w-64 bg-white/80 dark:bg-slate-900 border-r border-slate-200/50 dark:border-slate-800 flex flex-col flex-none z-10 backdrop-blur-xl shadow-xl transition-all duration-300">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 group cursor-default">

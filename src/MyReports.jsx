@@ -32,7 +32,7 @@ const MyReports = () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch your reports. Status: ${response.status}`);
+                    throw new Error(`Server Error: Unable to fetch your reports. Status: ${response.status}`);
                 }
 
                 const data = await response.json();
@@ -45,8 +45,8 @@ const MyReports = () => {
                 }
             } catch (err) {
                 console.error("Error fetching my items:", err);
-                setError(err.message);
-                showToast("Failed to load your reports.", "error");
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
+                showToast(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : "Failed to load your reports.", "error");
             } finally {
                 setIsLoading(false);
             }

@@ -39,14 +39,14 @@ const FoundItemDetails = () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch item. Status: ${response.status}`);
+                    throw new Error(`Server Error: Unable to load item. Status: ${response.status}`);
                 }
 
                 const result = await response.json();
                 setItemData(result.data);
             } catch (err) {
                 console.error("Error fetching item details:", err);
-                setError(err.message);
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
             } finally {
                 setIsLoading(false);
             }

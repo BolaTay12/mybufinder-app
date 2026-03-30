@@ -70,7 +70,7 @@ const AllClaims = () => {
                 }
             } catch (err) {
                 console.error("Error fetching claims:", err);
-                setError(err.message);
+                setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
             } finally {
                 setIsLoading(false);
             }
@@ -179,6 +179,7 @@ const AllClaims = () => {
 
     return (
         <div className="flex h-screen w-full bg-[#f8f9fc] font-['Lexend'] overflow-hidden">
+            {isStatusChanging && <LoadingSpinner fullScreen />}
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-slate-200 flex flex-col flex-none z-10">
                 <div className="p-6 border-b border-slate-100 flex items-center gap-3">

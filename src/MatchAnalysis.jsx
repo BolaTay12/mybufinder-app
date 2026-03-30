@@ -64,7 +64,7 @@ const MatchAnalysis = () => {
                     }
                 });
 
-                if (!response.ok) throw new Error('Failed to fetch potential matches');
+                if (!response.ok) throw new Error('Server Error: Unable to fetch potential matches');
                 const data = await response.json();
 
                 const matches = data.data || [];
@@ -83,7 +83,7 @@ const MatchAnalysis = () => {
                 setMatchResults(formattedAiResults);
             } catch (error) {
                 console.error("Error fetching found items:", error);
-                setItemsError(error.message);
+                setItemsError(error.message === 'Failed to fetch' || error.message.includes('NetworkError') ? 'Network Error' : error.message);
             } finally {
                 setFetchingItems(false);
             }
@@ -392,11 +392,18 @@ const MatchAnalysis = () => {
                         <div className="flex items-center justify-center gap-3">
                             <button
                                 className="h-11 px-6 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
-                                onClick={nextMatch}
-                                disabled={currentIndex === foundItems.length - 1}
+                                onClick={() => {
+                                    if (currentIndex < foundItems.length - 1) {
+                                        nextMatch();
+                                    } else {
+                                        navigate('/dashboard');
+                                    }
+                                }}
                             >
-                                <span className="material-symbols-outlined text-[18px]">skip_next</span>
-                                Not Mine, Show Next
+                                <span className="material-symbols-outlined text-[18px]">
+                                    {currentIndex === foundItems.length - 1 ? 'exit_to_app' : 'skip_next'}
+                                </span>
+                                {currentIndex === foundItems.length - 1 ? 'Not Mine, Return' : 'Not Mine, Show Next'}
                             </button>
                             <button
                                 className={`h-11 px-6 rounded-lg font-bold text-sm transition-colors flex items-center gap-2 shadow-sm ${aiResult?.confidence < 50 ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 dark:shadow-blue-900/20'}`}

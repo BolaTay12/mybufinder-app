@@ -11,6 +11,7 @@ const Dashboard = () => {
   const { showToast } = useUI();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('recently-lost');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +24,7 @@ const Dashboard = () => {
         const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
         const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
 
+        
         // Determine endpoint based on active tab and ask for 12 items specifically
         const endpoint = activeTab === 'recently-lost' ? '/items/recently-lost?limit=12' : '/items/recently-found?limit=12';
 
@@ -34,22 +36,22 @@ const Dashboard = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch items. Status: ${response.status}`);
+          throw new Error(`Server Error: Unable to load items. Status: ${response.status}`);
         }
 
         const data = await response.json();
         setItems(data.data || []);
       } catch (err) {
         console.error("Error fetching items:", err);
-        setError(err.message);
-        showToast("Failed to load dashboard items.", "error");
+        setError(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? 'Network Error' : err.message);
+        showToast(err.message === 'Failed to fetch' || err.message.includes('NetworkError') ? "Network Error" : "Failed to load dashboard items.", "error");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchItems();
-  }, [user, activeTab]); // Add activeTab to dependency array
+  }, [user, activeTab, showToast]); // Add activeTab to dependency array
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -74,10 +76,14 @@ const Dashboard = () => {
     }
   };
 
-  // Filter items by APPROVED status
+  // Sort items based on sortOrder
   // For testing purposes, we are currently showing ALL items including PENDING.
   // In production, uncomment the filter below.
-  const displayItems = items; // items.filter(item => item.status === 'APPROVED');
+  const displayItems = [...items].sort((a, b) => {
+    const timeA = new Date(a.createdAt).getTime();
+    const timeB = new Date(b.createdAt).getTime();
+    return sortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+  });
 
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-background-light dark:bg-slate-950 transition-colors duration-300">
@@ -159,13 +165,19 @@ const Dashboard = () => {
                 </button>
               </div>
               <div className="flex items-center gap-2 self-end sm:self-auto">
-                <button className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary px-2 py-1">
+                <button 
+                  onClick={() => navigate('/search-results')}
+                  className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary px-2 py-1 transition-colors"
+                >
                   <span className="material-symbols-outlined text-[18px]">filter_list</span>
                   Filter
                 </button>
-                <button className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary px-2 py-1">
-                  <span className="material-symbols-outlined text-[18px]">sort</span>
-                  Newest
+                <button 
+                  onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')}
+                  className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary px-2 py-1 transition-colors w-[80px] justify-start"
+                >
+                  <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${sortOrder === 'oldest' ? 'rotate-180' : ''}`}>sort</span>
+                  {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
                 </button>
               </div>
             </div>

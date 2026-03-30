@@ -19,6 +19,7 @@ const SearchResults = () => {
     const [searchQuery, setSearchQuery] = useState(initialQuery);
     const [searchInput, setSearchInput] = useState(initialQuery);
     const [viewMode, setViewMode] = useState(initialView); // 'grid' | 'map'
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
     // Sync viewMode with URL parameter changes
     useEffect(() => {
@@ -96,6 +97,15 @@ const SearchResults = () => {
                 params.append('location', activeFilters.location);
             }
 
+            if (activeFilters.dateRange.start) {
+                params.append('startDate', new Date(activeFilters.dateRange.start).toISOString());
+            }
+            if (activeFilters.dateRange.end) {
+                const endD = new Date(activeFilters.dateRange.end);
+                endD.setHours(23, 59, 59, 999);
+                params.append('endDate', endD.toISOString());
+            }
+
             // Create React App proxy will only forward requests reliably if they accept json
             const headers = {
                 'Accept': 'application/json'
@@ -105,8 +115,8 @@ const SearchResults = () => {
             // Backend /items/search throws 400 if q is empty or < 1 char. 
             // Better to fetch all items via /items if there's no query.
             if (searchQuery.trim().length > 0) {
-                params.append('limit', pagination.limit);
-                params.append('offset', currentOffset);
+                params.append('limit', 1000); // Fetch all to manually paginate/filter locally
+                params.append('offset', 0);
                 params.append('q', searchQuery.trim());
                 fetchUrl = `${baseUrl}/items/search?${params.toString()}`;
             } else {
@@ -142,51 +152,58 @@ const SearchResults = () => {
             if (data.status === 'success') {
                 let fetchedItems = data.data || [];
                 
-                // If we fetched from /items (no search query), we need to manually apply filters locally
-                // because the backend ignores them on the /items endpoint.
-                if (searchQuery.trim().length === 0) {
-                    if (activeFilters.status.length === 1) {
-                        const expectedType = activeFilters.status[0] === 'Lost Items' ? 'LOST' : 'FOUND';
-                        fetchedItems = fetchedItems.filter(item => item.type === expectedType);
-                    }
-                    if (activeFilters.category.length > 0) {
-                        const catMap = {
-                            'Electronics': 'electronics',
-                            'Documents & IDs': 'documents',
-                            'Documents': 'documents',
-                            'Personal Items': 'clothing',
-                            'Keys': 'keys',
-                            'Books': 'documents',
-                            'Other': 'other'
-                        };
-                        const mappedSelectedCats = activeFilters.category.map(cat => catMap[cat] || cat.toLowerCase());
-                        fetchedItems = fetchedItems.filter(item => {
-                            const itemCat = item.category ? item.category.toLowerCase() : '';
-                            return mappedSelectedCats.includes(itemCat);
-                        });
-                    }
-                    if (activeFilters.location !== 'All Locations') {
-                        fetchedItems = fetchedItems.filter(item => item.location === activeFilters.location);
-                    }
-                    
-                    // Local pagination
-                    const totalItems = fetchedItems.length;
-                    const paginatedItems = fetchedItems.slice(currentOffset, currentOffset + pagination.limit);
-                    
-                    setItems(paginatedItems);
-                    setPagination(prev => ({ ...prev, total: totalItems, offset: currentOffset }));
-                } else {
-                    setItems(fetchedItems);
-                    setPagination(prev => ({ ...prev, total: data.pagination?.total || fetchedItems.length || 0, offset: currentOffset }));
+                // We manually apply all filters locally across both endpoints
+                // to support filtering by Date, Location, and Type as the backend 
+                // ignores or poorly supports them on some routes.
+                
+                if (activeFilters.status.length === 1) {
+                    const expectedType = activeFilters.status[0] === 'Lost Items' ? 'LOST' : 'FOUND';
+                    fetchedItems = fetchedItems.filter(item => item.type === expectedType);
                 }
+                if (activeFilters.category.length > 0) {
+                    const catMap = {
+                        'Electronics': 'electronics',
+                        'Documents & IDs': 'documents',
+                        'Documents': 'documents',
+                        'Personal Items': 'clothing',
+                        'Keys': 'keys',
+                        'Books': 'documents',
+                        'Other': 'other'
+                    };
+                    const mappedSelectedCats = activeFilters.category.map(cat => catMap[cat] || cat.toLowerCase());
+                    fetchedItems = fetchedItems.filter(item => {
+                        const itemCat = item.category ? item.category.toLowerCase() : '';
+                        return mappedSelectedCats.includes(itemCat);
+                    });
+                }
+                if (activeFilters.location !== 'All Locations') {
+                    fetchedItems = fetchedItems.filter(item => item.location === activeFilters.location);
+                }
+
+                if (activeFilters.dateRange.start) {
+                    const startDate = new Date(activeFilters.dateRange.start).getTime();
+                    fetchedItems = fetchedItems.filter(item => new Date(item.createdAt || item.dateReported).getTime() >= startDate);
+                }
+                if (activeFilters.dateRange.end) {
+                    const endDate = new Date(activeFilters.dateRange.end).getTime() + 86400000; // Add 24h
+                    fetchedItems = fetchedItems.filter(item => new Date(item.createdAt || item.dateReported).getTime() <= endDate);
+                }
+                
+                // Local pagination
+                const totalItems = fetchedItems.length;
+                const paginatedItems = fetchedItems.slice(currentOffset, currentOffset + pagination.limit);
+                
+                setItems(paginatedItems);
+                setPagination(prev => ({ ...prev, total: totalItems, offset: currentOffset }));
             } else {
                 throw new Error(data.message || 'Error searching items');
             }
         } catch (err) {
             console.error('Search error:', err);
-            setError(err.message);
+            const isNetworkError = err.message === 'Failed to fetch' || err.message.includes('NetworkError');
+            setError(isNetworkError ? 'Network Error: Please check your connection.' : err.message);
             setItems([]);
-            showToast("Failed to perform search. Please try again.", "error");
+            showToast(isNetworkError ? "Network Error" : "Failed to perform search. Please try again.", "error");
         } finally {
             setLoading(false);
         }
@@ -222,10 +239,17 @@ const SearchResults = () => {
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar Filters */}
-                <aside className="hidden lg:block w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 overflow-y-auto flex-none transition-colors duration-300">
+                <aside className={`${isMobileFiltersOpen ? 'fixed inset-0 z-[100] flex flex-col w-full h-full' : 'hidden lg:block w-72'} bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 overflow-y-auto flex-none transition-colors duration-300`}>
                     <div className="p-6 sticky top-0 bg-white dark:bg-slate-900 z-10 border-b border-slate-100 dark:border-slate-800 mb-2 transition-colors duration-300">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Filters</h2>
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                {isMobileFiltersOpen && (
+                                    <button onClick={() => setIsMobileFiltersOpen(false)} className="lg:hidden size-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">close</span>
+                                    </button>
+                                )}
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Filters</h2>
+                            </div>
                             <button
                                 onClick={() => {
                                     setActiveFilters({
@@ -235,6 +259,7 @@ const SearchResults = () => {
                                         location: 'All Locations'
                                     });
                                     setSearchQuery('');
+                                    if (isMobileFiltersOpen) setIsMobileFiltersOpen(false);
                                 }}
                                 className="text-sm font-medium text-primary hover:text-blue-700"
                             >
@@ -301,11 +326,21 @@ const SearchResults = () => {
                             <div className="flex items-center gap-2">
                                 <div className="flex-1">
                                     <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 block">From</label>
-                                    <input type="date" className="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 focus:border-primary outline-none" />
+                                    <input 
+                                        type="date" 
+                                        value={activeFilters.dateRange.start}
+                                        onChange={(e) => setActiveFilters(prev => ({ ...prev, dateRange: { ...prev.dateRange, start: e.target.value } }))}
+                                        className="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 focus:border-primary outline-none" 
+                                    />
                                 </div>
                                 <div className="flex-1">
                                     <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 block">To</label>
-                                    <input type="date" className="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 focus:border-primary outline-none" />
+                                    <input 
+                                        type="date" 
+                                        value={activeFilters.dateRange.end}
+                                        onChange={(e) => setActiveFilters(prev => ({ ...prev, dateRange: { ...prev.dateRange, end: e.target.value } }))}
+                                        className="w-full p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 focus:border-primary outline-none" 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -313,10 +348,26 @@ const SearchResults = () => {
                         {/* Location */}
                         <div>
                             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Location</h3>
-                            <button className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-primary/50 transition-colors">
-                                <span>All Locations</span>
-                                <span className="material-symbols-outlined text-slate-400">expand_more</span>
-                            </button>
+                            <div className="relative">
+                                <select 
+                                    className="w-full appearance-none p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-primary/50 transition-colors focus:outline-none focus:border-primary"
+                                    value={activeFilters.location}
+                                    onChange={(e) => setActiveFilters(prev => ({ ...prev, location: e.target.value }))}
+                                >
+                                    <option value="All Locations">All Locations</option>
+                                    <option value="Babcock Business School">Babcock Business School</option>
+                                    <option value="Babcock Stadium">Babcock Stadium</option>
+                                    <option value="Babcock Super Store">Babcock Super Store</option>
+                                    <option value="University Library">University Library</option>
+                                    <option value="Cafeteria">Cafeteria</option>
+                                    <option value="Computer Science Dept">Computer Science Dept</option>
+                                    <option value="SADSS">SADSS</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                                    <span className="material-symbols-outlined">expand_more</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </aside>
@@ -339,30 +390,40 @@ const SearchResults = () => {
                             {/* Search Bar & Filters (Grid Only) */}
                             {viewMode === 'grid' && (
                                 <>
-                                    <div className="relative max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-colors group">
-                                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                                            <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            className="w-full h-14 pl-12 pr-24 bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
-                                            placeholder="Search for items like 'Macbook', 'Blue Wallet', 'ID Card'..."
-                                            value={searchInput}
-                                            onChange={(e) => setSearchInput(e.target.value)}
-                                            // Submit on enter
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
+                                    <div className="flex gap-3 w-full">
+                                        <div className="relative flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-colors group">
+                                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                                <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                className="w-full h-14 pl-12 pr-12 sm:pr-24 bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
+                                                placeholder="Search for items like 'Macbook'..."
+                                                value={searchInput}
+                                                onChange={(e) => setSearchInput(e.target.value)}
+                                                // Submit on enter
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        setSearchQuery(searchInput);
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                className="absolute inset-y-2 right-2 px-4 bg-[#136dec] hover:bg-blue-600 text-white font-medium rounded-lg text-sm transition-colors hidden sm:block"
+                                                onClick={() => {
                                                     setSearchQuery(searchInput);
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            className="absolute inset-y-2 right-2 px-4 bg-[#136dec] hover:bg-blue-600 text-white font-medium rounded-lg text-sm transition-colors"
-                                            onClick={() => {
-                                                setSearchQuery(searchInput);
-                                            }}
+                                                }}
+                                            >
+                                                Search
+                                            </button>
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={() => setIsMobileFiltersOpen(true)}
+                                            className="lg:hidden px-4 h-14 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary/50 flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 transition-colors"
                                         >
-                                            Search
+                                            <span className="material-symbols-outlined text-[20px] text-primary">tune</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider mt-0.5 text-primary">Filter</span>
                                         </button>
                                     </div>
 
@@ -381,7 +442,25 @@ const SearchResults = () => {
                                                 <button onClick={() => handleCategorySelect(cat)} className="hover:text-emerald-900 dark:hover:text-emerald-200"><span className="material-symbols-outlined text-[14px] align-middle">close</span></button>
                                             </span>
                                         ))}
-                                        {(activeFilters.status.length === 0 && activeFilters.category.length === 0) && (
+                                        {activeFilters.dateRange.start && (
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-100 dark:border-purple-900/30">
+                                                From {activeFilters.dateRange.start}
+                                                <button onClick={() => setActiveFilters(p => ({ ...p, dateRange: { ...p.dateRange, start: '' } }))} className="hover:text-purple-900 dark:hover:text-purple-200"><span className="material-symbols-outlined text-[14px] align-middle">close</span></button>
+                                            </span>
+                                        )}
+                                        {activeFilters.dateRange.end && (
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-100 dark:border-purple-900/30">
+                                                To {activeFilters.dateRange.end}
+                                                <button onClick={() => setActiveFilters(p => ({ ...p, dateRange: { ...p.dateRange, end: '' } }))} className="hover:text-purple-900 dark:hover:text-purple-200"><span className="material-symbols-outlined text-[14px] align-middle">close</span></button>
+                                            </span>
+                                        )}
+                                        {activeFilters.location !== 'All Locations' && (
+                                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 text-xs font-bold border border-orange-100 dark:border-orange-900/30">
+                                                {activeFilters.location}
+                                                <button onClick={() => setActiveFilters(p => ({ ...p, location: 'All Locations' }))} className="hover:text-orange-900 dark:hover:text-orange-200"><span className="material-symbols-outlined text-[14px] align-middle">close</span></button>
+                                            </span>
+                                        )}
+                                        {(activeFilters.status.length === 0 && activeFilters.category.length === 0 && !activeFilters.dateRange.start && !activeFilters.dateRange.end && activeFilters.location === 'All Locations') && (
                                             <span className="text-xs text-slate-400 italic">No filters active</span>
                                         )}
                                     </div>
