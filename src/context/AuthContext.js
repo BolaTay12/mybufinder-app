@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Check localStorage on mount
@@ -18,10 +20,39 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 console.error("Failed to parse user from localStorage", error);
                 localStorage.removeItem('user');
+                localStorage.removeItem('token');
             }
         }
         setIsLoading(false);
     }, []);
+
+    // Global fetch interceptor to handle 401 Unauthorized globally
+    useEffect(() => {
+        const originalFetch = window.fetch;
+        window.fetch = async (...args) => {
+            const response = await originalFetch(...args);
+            const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+            
+            // Check for 401 (Unauthorized) and exclude auth endpoints
+            if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/admin/login') && !url.includes('/auth/register')) {
+                // Wipe user session
+                setUser(null);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                
+                // Redirect if we are currently not on a public route
+                const currentPath = window.location.pathname;
+                if (currentPath !== '/' && currentPath !== '/admin-login' && currentPath !== '/register') {
+                    navigate('/');
+                }
+            }
+            return response;
+        };
+
+        return () => {
+            window.fetch = originalFetch; // restore on unmount
+        };
+    }, [navigate]);
 
     const login = (userData) => {
         try {

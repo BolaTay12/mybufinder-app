@@ -51,14 +51,34 @@ const Settings = () => {
         setIsUpdatingPassword(true);
 
         try {
-            // Simulate API call to update password
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const rawBaseUrl = process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_BASE_URL || 'https://bufinderbackend-production-04b6.up.railway.app');
+            const baseUrl = rawBaseUrl && !rawBaseUrl.startsWith('http') && process.env.NODE_ENV !== 'development' ? 'https://' + rawBaseUrl : rawBaseUrl;
+
+            const response = await fetch(`${baseUrl}/auth/reset`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.token}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    currenPassword: currentPassword,
+                    password: newPassword
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => null);
+                throw new Error(errData?.message || 'Failed to update password');
+            }
+
             showToast('Password updated successfully!', 'success');
             setCurrentPassword('');
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (error) {
-            showToast('Failed to update password. Please try again.', 'error');
+            console.error("Password update error:", error);
+            showToast(error.message || 'Failed to update password. Please try again.', 'error');
         } finally {
             setIsUpdatingPassword(false);
         }
